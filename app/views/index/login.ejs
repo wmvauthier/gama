@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+</head>
+
+<body>
+
+    <div class="splash-container">
+        <%=data%>
+        <div class="card-body">
+            <form id="formURL">
+                <div>
+                    <input type="text" placeholder="URL">
+                </div>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+<script>
+
+    document.getElementById("formURL").addEventListener("submit", function (e) {
+        e.preventDefault();
+        
+    });
+
+</script>
+
+</html>
