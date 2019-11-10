@@ -1,4 +1,9 @@
 module.exports.index = function (application, req, res) {
+    res.render('index/login');
+}
+
+module.exports.url = function (application, req, res) {
+
     function getAccessKey(str) {
         var accessKey = (str.substring(str.search("=") + 1)).substring(0, 44);
         return accessKey;
@@ -15,8 +20,20 @@ module.exports.index = function (application, req, res) {
         return obj;
     }
 
-    var str = "http://nfce.sefaz.pe.gov.br/nfce-web/consultarNFCe?p=26191008118879000182650010000693271005117969|2|1|1|1D435E4D8ACFE1058BBBA43127EBF0C6289C182C";
-    var data = getDataFromNFCe(str);
-    console.log(data);
-    res.render('index/login', { data: data });
+    function checkCNPJ(data) {
+        if (data.cnpj == '06859452001343') {
+            return "Saída Autorizada";
+        } else {
+            return "Nota Fiscal Não Permitida";
+        }
+    }
+
+    var qrcode = req.body;
+    var url = qrcode.url;
+
+    var data = getDataFromNFCe(url);
+    var check = checkCNPJ(data);
+    var result = `{"cnpj":"${data.cnpj}", "check":"${check}"}`;
+    res.send(result);
+
 }

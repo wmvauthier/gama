@@ -8,25 +8,62 @@
 <body>
 
     <div class="splash-container">
-        <%=data%>
-        <div class="card-body">
+        <div class="centeredX">
             <form id="formURL">
-                <div>
-                    <input type="text" placeholder="URL">
-                </div>
-                <button type="submit">Enviar</button>
+                <h1 id="result">Posicione o QRCode no Local indicado</h1>
+                <img src="http://s.glbimg.com/jo/g1/f/original/2011/05/17/qrcode.jpg">
+                </br></br>
+                <input id="nfce" type="text">
+                <button type="submit" class="invisible">Enviar</button>
             </form>
         </div>
     </div>
 
 </body>
 
+<style>
+    .invisible {
+        display: none;
+    }
+
+    .centeredX {
+        text-align: center;
+    }
+</style>
+
 <script>
 
     document.getElementById("formURL").addEventListener("submit", function (e) {
+
         e.preventDefault();
-        
+        var xhttp = new XMLHttpRequest();
+        var nfce = document.getElementById("nfce").value;
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var dados = JSON.parse(this.responseText);
+                document.getElementById("nfce").value = "";
+                document.getElementById("nfce").focus();
+                document.getElementById("result").innerHTML = dados.check;
+                setTimeout(function () {
+                    document.getElementById("result").innerHTML = "Posicione o QRCode no Local indicado"
+                }, 3000);
+            }
+        };
+        var url = `http://localhost:4000/url`;
+        xhttp.open("POST", url, true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send(`url=${nfce}`);
+
     });
+
+    document.addEventListener("click", function (e) {
+        document.getElementById("nfce").focus();
+    });
+
+    window.onload = function () {
+        document.getElementById("nfce").focus();
+    }
 
 </script>
 
