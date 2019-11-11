@@ -20,20 +20,35 @@ module.exports.url = function (application, req, res) {
         return obj;
     }
 
-    function checkCNPJ(data) {
-        if (data.cnpj == '06859452001343') {
-            return "Saída Autorizada";
-        } else {
-            return "Nota Fiscal Não Permitida";
-        }
+    function getAffiliates(res) {
+        request('http://localhost:3000/affiliate', { json: true }, (err, resp, body) => {
+            if (err) { return console.log(err); }
+
+            body.forEach(affiliate => {
+                Object.entries(affiliate).forEach(([key, value]) => {
+                    if (affiliate.cnpj == data.cnpj) {
+                        res.send("Saída Autorizada");
+                    }
+                    else {
+                        res.send("Nota Fiscal Não Permitida");
+                    }
+                    //result = `{"cnpj":"${data.cnpj}", "check":"${check}"}`;
+                    //console.log(`${data.cnpj} ${check}`);
+                });
+            });
+
+        });
     }
 
     var qrcode = req.body;
     var url = qrcode.url;
 
     var data = getDataFromNFCe(url);
-    var check = checkCNPJ(data);
-    var result = `{"cnpj":"${data.cnpj}", "check":"${check}"}`;
-    res.send(result);
+    var check = false;
+    var result = false;
+
+    const request = require('request');
+    console.log(getAffiliates(res));
+    res.send("result");
 
 }
