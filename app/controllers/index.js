@@ -15,6 +15,7 @@ module.exports.url = function (application, req, res) {
                         "year":"20${accessKey.substring(2, 4)}",
                         "month":"${accessKey.substring(4, 6)}",
                         "number":"${accessKey.substring(25, 34)}",
+                        "nfce":"${accessKey}",
                         "cnpj":"${accessKey.substring(6, 20).replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")}"}`;
         var obj = JSON.parse(extract);
         return obj;
