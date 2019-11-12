@@ -15,40 +15,15 @@ module.exports.url = function (application, req, res) {
                         "year":"20${accessKey.substring(2, 4)}",
                         "month":"${accessKey.substring(4, 6)}",
                         "number":"${accessKey.substring(25, 34)}",
-                        "cnpj":"${accessKey.substring(6, 20)}"}`;
+                        "cnpj":"${accessKey.substring(6, 20).replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")}"}`;
         var obj = JSON.parse(extract);
         return obj;
-    }
-
-    function getAffiliates(res) {
-        request('http://localhost:3000/affiliate', { json: true }, (err, resp, body) => {
-            if (err) { return console.log(err); }
-
-            body.forEach(affiliate => {
-                Object.entries(affiliate).forEach(([key, value]) => {
-                    if (affiliate.cnpj == data.cnpj) {
-                        res.send("Saída Autorizada");
-                    }
-                    else {
-                        res.send("Nota Fiscal Não Permitida");
-                    }
-                    //result = `{"cnpj":"${data.cnpj}", "check":"${check}"}`;
-                    //console.log(`${data.cnpj} ${check}`);
-                });
-            });
-
-        });
     }
 
     var qrcode = req.body;
     var url = qrcode.url;
 
     var data = getDataFromNFCe(url);
-    var check = false;
-    var result = false;
-
-    const request = require('request');
-    console.log(getAffiliates(res));
-    res.send("result");
+    res.send(data);
 
 }

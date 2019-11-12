@@ -11,7 +11,7 @@
         <div class="centeredX">
             <form id="formURL">
                 <h1 id="result">Posicione o QRCode no Local indicado</h1>
-                <img src="http://s.glbimg.com/jo/g1/f/original/2011/05/17/qrcode.jpg">
+                <img id="img" src="http://s.glbimg.com/jo/g1/f/original/2011/05/17/qrcode.jpg">
                 </br></br>
                 <input id="nfce" type="text">
                 <button type="submit" class="invisible">Enviar</button>
@@ -33,24 +33,63 @@
 
 <script>
 
+    var waitNFCE = "Posicione o QRCode no Local indicado"
+    var okNFCE = "Saída Liberada";
+    var wrongNFCE = "Nota Fiscal Não Permitida";
+
     document.getElementById("formURL").addEventListener("submit", function (e) {
 
         e.preventDefault();
-        var xhttp = new XMLHttpRequest();
         var nfce = document.getElementById("nfce").value;
+
+        var xhttp = new XMLHttpRequest();
         xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
+
             if (this.readyState == 4 && this.status == 200) {
-                //var dados = JSON.parse(this.responseText);
-                document.getElementById("nfce").value = "";
-                document.getElementById("nfce").focus();
-                console.log(this.responseText);
-                document.getElementById("result").innerHTML = dados.check;
-                setTimeout(function () {
-                    document.getElementById("result").innerHTML = "Posicione o QRCode no Local indicado"
-                }, 3000);
+
+                var dados = JSON.parse(this.responseText);
+
+                var xhttp2 = new XMLHttpRequest();
+                xhttp2 = new XMLHttpRequest();
+
+                xhttp2.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+
+                        var affiliates = JSON.parse(this.responseText);
+                        var check = false;
+
+                        affiliates.forEach(element => {
+                            if(element.cnpj == dados.cnpj){
+                                console.log(element);
+                                document.getElementById("nfce").value = "";
+                                document.getElementById("nfce").focus();
+                                document.getElementById("result").innerHTML = okNFCE;
+                                check = true;
+                            }
+                        });
+
+                        if(check == false){
+                            document.getElementById("nfce").value = "";
+                            document.getElementById("nfce").focus();
+                            document.getElementById("result").innerHTML = wrongNFCE;
+                        }
+
+                        setTimeout(function () {
+                            document.getElementById("result").innerHTML = waitNFCE;
+                        }, 4000);
+
+                    }
+                };
+
+                var url = `http://localhost:3000/affiliate`;
+                xhttp2.open("GET", url, true);
+                xhttp2.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhttp2.send();
+
             }
         };
+
         var url = `http://localhost:5000/url`;
         xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
