@@ -2,6 +2,47 @@ module.exports.index = function (application, req, res) {
     res.render('index/login');
 }
 
+module.exports.ip = function (application, req, res) {
+
+    function getIPAddress() {
+
+        var os = require('os');
+        var ifaces = os.networkInterfaces();
+        var ip = `{`;
+
+        Object.keys(ifaces).forEach(function (ifname) {
+
+            var alias = 0;
+
+            ifaces[ifname].forEach(function (iface) {
+                if ('IPv4' !== iface.family || iface.internal !== false) {
+                    return;
+                }
+
+                if (alias >= 1) {
+                    ip = ip + (`"${alias}" : "${iface.address}",`);
+                } else {
+                    ip = ip + (`"${alias}" : "${iface.address}",`);
+                }
+                ++alias;
+            });
+        });
+
+        ip = ip.slice(0, -1);
+
+        ip = ip + "}";
+        return ip;
+
+    }
+
+    var extract = getIPAddress();
+
+    var obj = JSON.parse(extract);
+
+    res.send(obj);
+
+}
+
 module.exports.url = function (application, req, res) {
 
     function getAccessKey(str) {
@@ -25,26 +66,6 @@ module.exports.url = function (application, req, res) {
     var url = qrcode.url;
 
     var data = getDataFromNFCe(url);
-
-    var os = require('os');
-    var ifaces = os.networkInterfaces();
-
-    Object.keys(ifaces).forEach(function (ifname) {
-        var alias = 0;
-
-        ifaces[ifname].forEach(function (iface) {
-            if ('IPv4' !== iface.family || iface.internal !== false) {
-                return;
-            }
-
-            if (alias >= 1) {
-                console.log(ifname + ':' + alias, iface.address);
-            } else {
-                console.log(ifname, iface.address);
-            }
-            ++alias;
-        });
-    });
 
     res.send(data);
 

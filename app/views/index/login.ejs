@@ -2,18 +2,27 @@
 <html lang="en">
 
 <head>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 </head>
 
 <body>
 
-    <div class="splash-container">
+    <div class="section">
+
+        <div class="video-container">
+            <div class="color-overlay"></div>
+            <video id="video" autoplay loop muted>
+                <source id="source" type="video/mp4">
+            </video>
+        </div>
+
+    </div>
+
+    <div class="splash-container centeredX">
         <div class="centeredX">
             <form id="formURL">
-                <h1 id="result">Posicione o QRCode no Local indicado</h1>
-                <img id="img" src="http://s.glbimg.com/jo/g1/f/original/2011/05/17/qrcode.jpg">
-                </br></br>
-                <input id="nfce" type="text">
+                <h1 id="result"></h1>
+                <input id="nfce" type="text" autocomplete="off">
                 <button type="submit" class="invisible">Enviar</button>
             </form>
         </div>
@@ -29,6 +38,29 @@
     .centeredX {
         text-align: center;
     }
+
+    body {
+        overflow: hidden;
+        font-family: "Impact", fantasy;
+    }
+
+    video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -1000;
+        overflow: hidden;
+    }
+
+    #nfce {
+        opacity: 0;
+    }
 </style>
 
 <script>
@@ -37,6 +69,13 @@
     var waitNFCE = "Posicione o QRCode no Local indicado"
     var wrongNFCE = "Nota Fiscal Não Permitida";
     var usedNFCE = "Nota Fiscal Já Utilizada";
+    var waitingVideo = "waitingVideo.mp4";
+    var allowedVideo = "allowedVideo.mp4";
+    var notAllowedVideo = "notAllowedVideo.mp4";
+
+    document.addEventListener("click", function (e) {
+        document.getElementById("nfce").focus();
+    });
 
     document.getElementById("formURL").addEventListener("submit", function (e) {
 
@@ -89,12 +128,15 @@
 
                                 if (checkCNPJ == false && checkNFCE == false) {
                                     cleanInputNFCE();
+                                    changeSRCNotAllowed();
                                     document.getElementById("result").innerHTML = wrongNFCE;
                                 } else if (checkCNPJ == false && checkNFCE == true) {
                                     cleanInputNFCE();
+                                    changeSRCNotAllowed();
                                     document.getElementById("result").innerHTML = wrongNFCE;
                                 } else if (checkCNPJ == true && checkNFCE == true) {
                                     cleanInputNFCE();
+                                    changeSRCNotAllowed();
                                     document.getElementById("result").innerHTML = usedNFCE;
                                 } else if (checkCNPJ == true && checkNFCE == false) {
 
@@ -108,6 +150,7 @@
                                             console.log(doc);
                                             console.log(affiliate);
                                             cleanInputNFCE();
+                                            changeSRCAllowed();
                                             document.getElementById("result").innerHTML = okNFCE;
                                         }
                                     }
@@ -121,6 +164,7 @@
 
                                 setTimeout(function () {
                                     document.getElementById("result").innerHTML = waitNFCE;
+                                    changeSRCWaiting();
                                 }, 4000);
 
                             }
@@ -151,17 +195,82 @@
 
     });
 
+    function changeSRCWaiting() {
+
+        var video = document.getElementById('video');
+        var source = document.getElementById('source');
+
+        video.pause();
+        source.setAttribute('src', waitingVideo);
+        video.load();
+        video.play();
+
+    }
+
+    function changeSRCAllowed() {
+
+        var video = document.getElementById('video');
+        var source = document.getElementById('source');
+
+        video.pause();
+        source.setAttribute('src', allowedVideo);
+        video.load();
+        video.play();
+
+    }
+
+    function changeSRCNotAllowed() {
+
+        var video = document.getElementById('video');
+        var source = document.getElementById('source');
+
+        video.pause();
+        source.setAttribute('src', notAllowedVideo);
+        video.load();
+        video.play();
+
+    }
+
+    function checkTerminalGama() {
+
+        var ipList = httpGet("http://localhost:5000/ip");
+        var terminalList = httpGet("http://localhost:3000/terminal");
+        var terminalResult = false;
+
+        terminalList.forEach(terminal => {
+
+            for (var key in ipList) {
+                if (!ipList.hasOwnProperty(key)) { continue; }
+                if (ipList[key] == terminal.ip) {
+                    terminalResult = terminal;
+                }
+            };
+
+        });
+
+        if (terminalResult == false) {
+            console.log("Terminal não cadastrado");
+        } else {
+            document.getElementById("nfce").focus();
+            changeSRCWaiting();
+        }
+
+    }
+
     function cleanInputNFCE() {
         document.getElementById("nfce").value = "";
         document.getElementById("nfce").focus();
     }
 
-    document.addEventListener("click", function (e) {
-        document.getElementById("nfce").focus();
-    });
+    function httpGet(theUrl) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", theUrl, false); // false for synchronous request
+        xmlHttp.send(null);
+        return JSON.parse(xmlHttp.responseText);
+    }
 
     window.onload = function () {
-        document.getElementById("nfce").focus();
+        checkTerminalGama();
     }
 
 </script>
