@@ -3,6 +3,8 @@
 
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <script src="js/libs/jquery.js"></script>
+    <script src="js/system/serverConfig.js"></script>
 </head>
 
 <body>
@@ -77,6 +79,31 @@
         document.getElementById("nfce").focus();
     });
 
+    /*
+
+    CASO O SCANNER NÃO DÊ ENTER SOZINHO
+    
+    setup before functions
+    var typingTimer;                //timer identifier
+    var doneTypingInterval = 500;  //time in ms, 5 second for example
+    var $input = $('#nfce');
+
+    //on keyup, start the countdown
+    $input.on('keyup', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    });
+
+    //on keydown, clear the countdown 
+    $input.on('keydown', function () {
+    clearTimeout(typingTimer);
+    });
+
+    //user is "finished typing," do something
+    function doneTyping () {
+        $(#formURL).submit();
+    }*/
+
     document.getElementById("formURL").addEventListener("submit", function (e) {
 
         e.preventDefault();
@@ -147,15 +174,13 @@
                                     xhttp4.onreadystatechange = function () {
                                         if (this.readyState == 4 && this.status == 200) {
                                             var doc = JSON.parse(this.responseText);
-                                            console.log(doc);
-                                            console.log(affiliate);
                                             cleanInputNFCE();
                                             changeSRCAllowed();
                                             document.getElementById("result").innerHTML = okNFCE;
                                         }
                                     }
 
-                                    var url = `http://localhost:3000/document`;
+                                    var url = `http://${IP_DO_SERVIDOR}:3000/document`;
                                     xhttp4.open("POST", url, true);
                                     xhttp4.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                                     xhttp4.send(`document_type=${document_type}&nfce=${NFCE}`);
@@ -171,7 +196,7 @@
 
                         }
 
-                        var url = `http://localhost:3000/document_Affiliates`;
+                        var url = `http://${IP_DO_SERVIDOR}:3000/document_Affiliates`;
                         xhttp3.open("GET", url, true);
                         xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                         xhttp3.send();
@@ -179,7 +204,7 @@
                     };
                 }
 
-                var url = `http://localhost:3000/affiliate`;
+                var url = `http://${IP_DO_SERVIDOR}:3000/affiliate`;
                 xhttp2.open("GET", url, true);
                 xhttp2.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xhttp2.send();
@@ -188,7 +213,7 @@
 
         }
 
-        var url = `http://localhost:5000/url`;
+        var url = `http://${IP_DO_SERVIDOR}:5000/url`;
         xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(`url=${nfce}`);
@@ -233,8 +258,8 @@
 
     function checkTerminalGama() {
 
-        var ipList = httpGet("http://localhost:5000/ip");
-        var terminalList = httpGet("http://localhost:3000/terminal");
+        var ipList = httpGet(`http://${IP_DO_SERVIDOR}:5000/ip`);
+        var terminalList = httpGet(`http://${IP_DO_SERVIDOR}:3000/terminal`);
         var terminalResult = false;
 
         terminalList.forEach(terminal => {
