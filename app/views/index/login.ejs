@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <script src="js/libs/jquery.js"></script>
     <script src="js/system/serverConfig.js"></script>
 </head>
@@ -23,7 +22,7 @@
     <div class="splash-container centeredX">
         <div class="centeredX">
             <form id="formURL">
-                <h1 id="result"></h1>
+                <h1 id="result" class="invisible"></h1>
                 <input id="nfce" type="text" autocomplete="off">
                 <button type="submit" class="invisible">Enviar</button>
             </form>
@@ -174,6 +173,7 @@
                                     xhttp4.onreadystatechange = function () {
                                         if (this.readyState == 4 && this.status == 200) {
                                             var doc = JSON.parse(this.responseText);
+                                            actCancel();
                                             cleanInputNFCE();
                                             changeSRCAllowed();
                                             document.getElementById("result").innerHTML = okNFCE;
@@ -276,6 +276,7 @@
         if (terminalResult == false) {
             console.log("Terminal não cadastrado");
         } else {
+            localStorage.setItem('IP',terminalResult.ip_cancela);
             document.getElementById("nfce").focus();
             changeSRCWaiting();
         }
@@ -287,11 +288,23 @@
         document.getElementById("nfce").focus();
     }
 
+    function actCancel(ip) {
+        var ip = localStorage.getItem("IP");
+        httpGet2(`http://${ip}:3000/actCancelON`);
+    }
+
     function httpGet(theUrl) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", theUrl, false); // false for synchronous request
         xmlHttp.send(null);
         return JSON.parse(xmlHttp.responseText);
+    }
+
+    function httpGet2(theUrl) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", theUrl, false); // false for synchronous request
+        xmlHttp.send(null);
+        return true;
     }
 
     window.onload = function () {
