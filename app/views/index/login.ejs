@@ -32,17 +32,15 @@
 </body>
 
 <style>
+    body{
+        overflow: hidden;
+    }
     .invisible {
         display: none;
     }
 
     .centeredX {
         text-align: center;
-    }
-
-    body {
-        overflow: hidden;
-        font-family: "Impact", fantasy;
     }
 
     video {
@@ -70,38 +68,19 @@
     var waitNFCE = "Posicione o QRCode no Local indicado"
     var wrongNFCE = "Nota Fiscal Não Permitida";
     var usedNFCE = "Nota Fiscal Já Utilizada";
-    var waitingVideo = "waitingVideo.mp4";
-    var allowedVideo = "allowedVideo.mp4";
-    var notAllowedVideo = "notAllowedVideo.mp4";
+
+    var waitingVideo = "js/files/video/waitingVideo.mp4";
+    var allowedVideo = "js/files/video/allowedVideo.mp4";
+    var notAllowedVideo = "js/files/video/notAllowedVideo.mp4";
+
+    var allowedAudio = new Audio('js/files/audio/allowedAudio.wav');
+    var waitingAudio = new Audio('js/files/audio/waitingAudio.wav');
+    var wrongAudio = new Audio('js/files/audio/wrongAudio.wav');
+    var usedAudio = new Audio('js/files/audio/usedAudio.wav');
 
     document.addEventListener("click", function (e) {
         document.getElementById("nfce").focus();
     });
-
-    /*
-
-    CASO O SCANNER NÃO DÊ ENTER SOZINHO
-    
-    setup before functions
-    var typingTimer;                //timer identifier
-    var doneTypingInterval = 500;  //time in ms, 5 second for example
-    var $input = $('#nfce');
-
-    //on keyup, start the countdown
-    $input.on('keyup', function () {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(doneTyping, doneTypingInterval);
-    });
-
-    //on keydown, clear the countdown 
-    $input.on('keydown', function () {
-    clearTimeout(typingTimer);
-    });
-
-    //user is "finished typing," do something
-    function doneTyping () {
-        $(#formURL).submit();
-    }*/
 
     document.getElementById("formURL").addEventListener("submit", function (e) {
 
@@ -155,14 +134,17 @@
                                 if (checkCNPJ == false && checkNFCE == false) {
                                     cleanInputNFCE();
                                     changeSRCNotAllowed();
+                                    wrongAudio.play();
                                     document.getElementById("result").innerHTML = wrongNFCE;
                                 } else if (checkCNPJ == false && checkNFCE == true) {
                                     cleanInputNFCE();
                                     changeSRCNotAllowed();
+                                    wrongAudio.play();
                                     document.getElementById("result").innerHTML = wrongNFCE;
                                 } else if (checkCNPJ == true && checkNFCE == true) {
                                     cleanInputNFCE();
                                     changeSRCNotAllowed();
+                                    usedAudio.play();
                                     document.getElementById("result").innerHTML = usedNFCE;
                                 } else if (checkCNPJ == true && checkNFCE == false) {
 
@@ -176,6 +158,7 @@
                                             actCancel();
                                             cleanInputNFCE();
                                             changeSRCAllowed();
+                                            allowedAudio.play();
                                             document.getElementById("result").innerHTML = okNFCE;
                                         }
                                     }
