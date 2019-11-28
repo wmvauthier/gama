@@ -290,7 +290,7 @@
 
     function actCancel(ip) {
         var ip = localStorage.getItem("IP");
-        httpGet2(`http://${ip}:3000/actCancelON`);
+        httpGet2(`http://${ip}:2000/actCancel`);
     }
 
     function httpGet(theUrl) {
@@ -302,9 +302,8 @@
 
     function httpGet2(theUrl) {
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", theUrl, false); // false for synchronous request
+        xmlHttp.open("GET", theUrl, true); // false for synchronous request
         xmlHttp.send(null);
-        return true;
     }
 
     window.onload = function () {
