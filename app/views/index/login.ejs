@@ -213,7 +213,7 @@
 
         }
 
-        var url = `http://${IP_DO_SERVIDOR}:5000/url`;
+        var url = `http://localhost:5000/url`;
         xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(`url=${nfce}`);
@@ -258,7 +258,7 @@
 
     function checkTerminalGama() {
 
-        var ipList = httpGet(`http://${IP_DO_SERVIDOR}:5000/ip`);
+        var ipList = httpGet(`http://localhost:5000/ip`);
         var terminalList = httpGet(`http://${IP_DO_SERVIDOR}:3000/terminal`);
         var terminalResult = false;
 
