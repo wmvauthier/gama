@@ -1,1 +1,1 @@
-IP_DO_SERVIDOR = '192.168.0.136';
+IP_DO_SERVIDOR = 'localhost';
