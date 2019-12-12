@@ -10,7 +10,7 @@ var waitingAudio = new Audio('js/files/audio/waitingAudio.wav');
 var wrongAudio = new Audio('js/files/audio/wrongAudio.wav');
 var usedAudio = new Audio('js/files/audio/usedAudio.wav');
 
-document.addEventListener("click", function (e) {
+$(document).click( function (e) {
     $("#nfce").focus();
 });
 
@@ -42,7 +42,6 @@ $("#formURL").submit( function (e) {
                         if (this.readyState == 4 && this.status == 200) {
                             var usedDocuments = JSON.parse(this.responseText);
 
-                            var affiliate = false;
                             var NFCE = false;
                             var checkCNPJ = false;
                             var checkNFCE = false;
@@ -130,21 +129,18 @@ $("#formURL").submit( function (e) {
 });
 
 function changeSRCWaiting() {
-    video.pause();
     source.setAttribute('src', waitingVideo);
     video.load();
     video.play();
 }
 
 function changeSRCAllowed() {
-    video.pause();
     source.setAttribute('src', allowedVideo);
     video.load();
     video.play();
 }
 
 function changeSRCNotAllowed() {
-    video.pause();
     source.setAttribute('src', notAllowedVideo);
     video.load();
     video.play();
