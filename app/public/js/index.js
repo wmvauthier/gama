@@ -10,121 +10,68 @@ var waitingAudio = new Audio('js/files/audio/waitingAudio.wav');
 var wrongAudio = new Audio('js/files/audio/wrongAudio.wav');
 var usedAudio = new Audio('js/files/audio/usedAudio.wav');
 
-$(document).click( function (e) {
+$(document).click(function (e) {
     $("#nfce").focus();
 });
 
-$("#formURL").submit( function (e) {
+$("#formURL").submit(function (e) {
 
     e.preventDefault();
     var nfce = $("#nfce").val();
 
-    var xhttp = new XMLHttpRequest();
-    xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
+    var dadosURL = httpPost(`http://localhost:5000/url`, `url=${nfce}`);
+    var affiliates = httpGet(`http://${IP_DO_SERVIDOR}:3000/affiliate`);
+    var usedDocuments = httpGet(`http://${IP_DO_SERVIDOR}:3000/document_Affiliates`);
 
-        if (this.readyState == 4 && this.status == 200) {
+    var NFCE = false;
+    var checkCNPJ = false;
+    var checkNFCE = false;
 
-            var dadosURL = JSON.parse(this.responseText);
+    affiliates.forEach(element => {
+        if (dadosURL.cnpj == element.cnpj) {
+            checkCNPJ = true;
+            affiliate = element;
+        }
+    });
 
-            var xhttp2 = new XMLHttpRequest();
-            xhttp2 = new XMLHttpRequest();
+    usedDocuments.forEach(element => {
+        if (dadosURL.nfce == element.nfce) {
+            checkNFCE = true;
+            NFCE = element;
+        }
+    });
 
-            xhttp2.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
+    NFCE = dadosURL.nfce;
 
-                    var affiliates = JSON.parse(this.responseText);
+    if (checkCNPJ == false && checkNFCE == false) {
+        cleanInputNFCE();
+        changeSRCNotAllowed();
+        wrongAudio.play();
+    } else if (checkCNPJ == false && checkNFCE == true) {
+        cleanInputNFCE();
+        changeSRCNotAllowed();
+        wrongAudio.play();
+    } else if (checkCNPJ == true && checkNFCE == true) {
+        cleanInputNFCE();
+        changeSRCNotAllowed();
+        usedAudio.play();
+    } else if (checkCNPJ == true && checkNFCE == false) {
 
-                    var xhttp3 = new XMLHttpRequest();
-                    xhttp3 = new XMLHttpRequest();
+        var doc = httpGet(`http://${IP_DO_SERVIDOR}:3000/getRandomAFF`);
+        var documentData = `id_document=${doc.id_document}&document_type=${doc.document_type}&nfce=${NFCE}&data_entrada=${doc.data_entrada}&terminal_entrada=${doc.terminal_entrada}&terminal_saida=${localStorage.getItem("terminal")}&patio=${localStorage.getItem("patio")}`;
 
-                    xhttp3.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            var usedDocuments = JSON.parse(this.responseText);
+        httpPost(`http://${IP_DO_SERVIDOR}:3000/exitDocument`, documentData);
 
-                            var NFCE = false;
-                            var checkCNPJ = false;
-                            var checkNFCE = false;
-
-                            affiliates.forEach(element => {
-                                if (dadosURL.cnpj == element.cnpj) {
-                                    checkCNPJ = true;
-                                    affiliate = element;
-                                }
-                            });
-
-                            usedDocuments.forEach(element => {
-                                if (dadosURL.nfce == element.nfce) {
-                                    checkNFCE = true;
-                                    NFCE = element;
-                                }
-                            });
-
-                            NFCE = dadosURL.nfce;
-
-                            if (checkCNPJ == false && checkNFCE == false) {
-                                cleanInputNFCE();
-                                changeSRCNotAllowed();
-                                wrongAudio.play();
-                            } else if (checkCNPJ == false && checkNFCE == true) {
-                                cleanInputNFCE();
-                                changeSRCNotAllowed();
-                                wrongAudio.play();
-                            } else if (checkCNPJ == true && checkNFCE == true) {
-                                cleanInputNFCE();
-                                changeSRCNotAllowed();
-                                usedAudio.play();
-                            } else if (checkCNPJ == true && checkNFCE == false) {
-
-                                var xhttp4 = new XMLHttpRequest();
-                                xhttp4 = new XMLHttpRequest();
-                                var document_type = "AFF";
-
-                                xhttp4.onreadystatechange = function () {
-                                    if (this.readyState == 4 && this.status == 200) {
-                                        actCancel();
-                                        cleanInputNFCE();
-                                        changeSRCAllowed();
-                                        allowedAudio.play();
-                                    }
-                                }
-
-                                var url = `http://${IP_DO_SERVIDOR}:3000/document`;
-                                xhttp4.open("POST", url, true);
-                                xhttp4.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                                xhttp4.send(`document_type=${document_type}&nfce=${NFCE}`);
-
-                            }
-
-                            setTimeout(function () {
-                                changeSRCWaiting();
-                            }, 6000);
-
-                        }
-
-                    }
-
-                    var url = `http://${IP_DO_SERVIDOR}:3000/document_Affiliates`;
-                    xhttp3.open("GET", url, true);
-                    xhttp3.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    xhttp3.send();
-
-                };
-            }
-
-            var url = `http://${IP_DO_SERVIDOR}:3000/affiliate`;
-            xhttp2.open("GET", url, true);
-            xhttp2.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhttp2.send();
-
-        };
+        actCancel();
+        cleanInputNFCE();
+        changeSRCAllowed();
+        allowedAudio.play();
 
     }
 
-    var url = `http://localhost:5000/url`;
-    xhttp.open("POST", url, true);
-    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhttp.send(`url=${nfce}`);
+    setTimeout(function () {
+        changeSRCWaiting();
+    }, 6000);
 
 });
 
@@ -147,15 +94,15 @@ function changeSRCNotAllowed() {
 }
 
 function changeBKGnoServer() {
-    $("body").css("backgroundImage","url('../js/files/img/noServer.png')")
+    $("body").css("backgroundImage", "url('../js/files/img/noServer.png')")
 }
 
 function changeBKGnoRegister() {
-    $("body").css("backgroundImage","url('../js/files/img/noRegister.png')")
+    $("body").css("backgroundImage", "url('../js/files/img/noRegister.png')")
 }
 
 function changeBKGtypeTerminal() {
-    $("body").css("backgroundImage","url('../js/files/img/typeTerminal.png')")
+    $("body").css("backgroundImage", "url('../js/files/img/typeTerminal.png')")
 }
 
 function checkTerminalGama() {
@@ -180,9 +127,11 @@ function checkTerminalGama() {
     } else if (terminalResult.funcao !== "GAMA - SAÍDA") {
         changeBKGtypeTerminal();
     } else {
+        localStorage.setItem('terminal', terminalResult.descricao);
+        localStorage.setItem('patio', terminalResult.patio);
         localStorage.setItem('IP', terminalResult.ip_cancela);
         $("#nfce").focus();
-        $("body").css("backgroundImage","url('')")
+        $("body").css("backgroundImage", "url('')")
         changeSRCWaiting();
     }
 
@@ -209,6 +158,14 @@ function httpGet2(theUrl) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open("GET", theUrl, true); // false for synchronous request
     xmlHttp.send(null);
+}
+
+function httpPost(theUrl, data) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST", theUrl, false); // false for synchronous request
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlHttp.send(data);
+    return JSON.parse(xmlHttp.responseText);
 }
 
 window.onload = function () {
