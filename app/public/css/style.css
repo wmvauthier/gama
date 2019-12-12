@@ -1,0 +1,45 @@
+
+    body {
+        overflow: hidden;
+                /* The image used */
+                background-image: url("../js/files/img/noServer.png");
+      
+                /* Full height */
+                height: 100%;
+              
+                /* Center and scale the image nicely */
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+    }
+
+    body, html {
+        height: 100%;
+      }
+
+    .invisible {
+        display: none;
+    }
+
+    .centeredX {
+        text-align: center;
+    }
+
+    video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -1000;
+        overflow: hidden;
+    }
+
+    #nfce {
+        opacity: 0;
+    }
+    
